@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://cjba8s5d3g4b5"]
+[gd_scene load_steps=27 format=3 uid="uid://cjba8s5d3g4b5"]
 
 [ext_resource type="Texture2D" uid="uid://bg1bt4gnlcyk2" path="res://assets/sprites/knight.png" id="1_5r26o"]
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_q1luc"]
@@ -171,6 +171,9 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_3qilu"]
 radius = 5.0
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4oj4y"]
+size = Vector2(12, 16.125)
+
 [node name="Player" type="CharacterBody2D"]
 z_index = 5
 collision_layer = 2
@@ -181,9 +184,21 @@ position = Vector2(1, -12)
 sprite_frames = SubResource("SpriteFrames_wfl7g")
 animation = &"run"
 autoplay = "idle"
-frame = 6
-frame_progress = 0.320989
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(1, -5)
 shape = SubResource("CircleShape2D_3qilu")
+
+[node name="CoyoteArea" type="Area2D" parent="."]
+z_as_relative = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CoyoteArea"]
+position = Vector2(1, 2.9375)
+shape = SubResource("RectangleShape2D_4oj4y")
+debug_color = Color(0.934247, 0.200716, 0.411331, 0.42)
+
+[node name="ExitTimer" type="Timer" parent="CoyoteArea"]
+
+[connection signal="body_entered" from="CoyoteArea" to="." method="_on_coyote_area_body_entered"]
+[connection signal="body_exited" from="CoyoteArea" to="." method="_on_coyote_area_body_exited"]
+[connection signal="timeout" from="CoyoteArea/ExitTimer" to="." method="_on_timer_timeout"]
