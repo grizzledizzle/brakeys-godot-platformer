@@ -1,52 +1,37 @@
 extends CharacterBody2D
 
 @onready var animated_sprite = $AnimatedSprite2D
-@onready var exit_timer = $CoyoteArea/ExitTimer
+@onready var jump_buffer = $JumpBuffer
+@onready var coyote_timer = $CoyoteTimer
 
 const SPEED = 130.0
 const JUMP_VELOCITY = -300.0
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
-var near_floor = true
-var on_floor_soon = false
-var jump_on_landing = false
+var is_jumping = false
 
-func _on_coyote_area_body_entered(body):
-	near_floor = true
-	on_floor_soon = true
-
-func _on_coyote_area_body_exited(body):
-	if !exit_timer.is_stopped() && !is_on_floor():
-		exit_timer.start(0.2)
-
-func _on_timer_timeout():
-	near_floor = false
-
-func on_floor():
-	return near_floor || is_on_floor()
+func jump():
+	velocity.y = JUMP_VELOCITY
+	is_jumping = true
+	jump_buffer.stop()
+	coyote_timer.stop()
 
 func _physics_process(delta):
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y += gravity * delta
+	if is_jumping && velocity.y >= 0:
+		is_jumping = false
 
 	# Handle jump.
-	if Input.is_action_just_pressed("jump") and on_floor():
-		velocity.y = JUMP_VELOCITY
-		near_floor = false
-		exit_timer.stop()
-	elif Input.is_action_just_pressed("jump") and on_floor_soon:
-		jump_on_landing = true
-		
-	if jump_on_landing && Input.is_action_pressed("jump") && is_on_floor():
-		velocity.y = JUMP_VELOCITY
-		jump_on_landing = false
-		on_floor_soon = false
-		near_floor = false
-		
-
-	#  gets input direction: -1, 0, 1
+	if Input.is_action_just_pressed("jump"):
+		if is_on_floor() || !coyote_timer.is_stopped():
+			jump()
+		elif !is_on_floor():
+			jump_buffer.start()
+	
+	#  gets input direction: -1, 0, 1 
 	var direction = Input.get_axis("move_left", "move_right")
 	
 	#flip sprite
@@ -69,5 +54,13 @@ func _physics_process(delta):
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
+	var was_on_floor = is_on_floor()
+	
 	move_and_slide()
+	
+	if !is_on_floor() && was_on_floor && !is_jumping:
+		coyote_timer.start()
+	if is_on_floor() && !jump_buffer.is_stopped():
+		jump()
+	
 
