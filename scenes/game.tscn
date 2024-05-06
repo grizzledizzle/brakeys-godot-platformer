@@ -485,7 +485,7 @@ layer_2/z_index = 1
 layer_2/tile_data = PackedInt32Array()
 
 [node name="Player" parent="." instance=ExtResource("1_jbyul")]
-position = Vector2(83, 75)
+position = Vector2(517, 84)
 
 [node name="Camera2D" type="Camera2D" parent="Player"]
 position = Vector2(3, -1)
@@ -502,7 +502,10 @@ position = Vector2(297, 199)
 shape = SubResource("WorldBoundaryShape2D_8sg3n")
 
 [node name="slime" parent="." instance=ExtResource("6_00flw")]
-position = Vector2(457, 101)
+position = Vector2(175, 97)
+
+[node name="slime2" parent="." instance=ExtResource("6_00flw")]
+position = Vector2(462, 69)
 
 [node name="platform" parent="." instance=ExtResource("3_jft74")]
 position = Vector2(145, 54)
